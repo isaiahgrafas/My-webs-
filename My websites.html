@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isaiah Grafas | Web Design Tauranga</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;700;900&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #050505;
+  --dark: #0a0a0a;
+  --accent: #7fff6a;
+  --accent2: #6af0ff;
+  --accent3: #ff6a9f;
+  --white: #f0f0f0;
+  --mid: #1a1a1a;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CUSTOM CURSOR ── */
+.cursor {
+  width: 12px; height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background 0.2s;
+  mix-blend-mode: difference;
+}
+.cursor-ring {
+  width: 40px; height: 40px;
+  border: 1px solid rgba(127,255,106,0.5);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease-out;
+}
+body:hover .cursor { opacity: 1; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 3rem;
+  mix-blend-mode: difference;
+}
+.nav-logo {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.85rem; font-weight: 700;
+  color: var(--white); text-decoration: none;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.nav-right {
+  display: flex; gap: 2.5rem; align-items: center;
+}
+.nav-link {
+  color: rgba(240,240,240,0.5); text-decoration: none;
+  font-size: 0.72rem; font-weight: 400; letter-spacing: 0.15em;
+  text-transform: uppercase; transition: color 0.2s;
+}
+.nav-link:hover { color: var(--white); }
+
+/* ── CANVAS ── */
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── HERO ── */
+.hero {
+  height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+  overflow: hidden;
+}
+
+.hero-content {
+  text-align: center;
+  position: relative; z-index: 2;
+}
+
+.hero-eyebrow {
+  font-size: 0.7rem; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--accent); font-weight: 300;
+  margin-bottom: 2rem;
+  opacity: 0; animation: fadeUp 1s ease 0.3s forwards;
+}
+
+.hero-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(3.5rem, 10vw, 11rem);
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  opacity: 0; animation: fadeUp 1s ease 0.5s forwards;
+}
+
+.hero-title .line { display: block; overflow: hidden; }
+.hero-title .outline {
+  -webkit-text-stroke: 1px rgba(240,240,240,0.25);
+  color: transparent;
+}
+.hero-title .accent-word { color: var(--accent); }
+
+.hero-sub {
+  font-size: 0.9rem; color: rgba(240,240,240,0.4); font-weight: 300;
+  letter-spacing: 0.08em; margin-top: 2.5rem;
+  opacity: 0; animation: fadeUp 1s ease 0.8s forwards;
+}
+
+.hero-scroll {
+  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(240,240,240,0.3);
+  opacity: 0; animation: fadeIn 1s ease 1.5s forwards;
+}
+.scroll-line {
+  width: 1px; height: 60px;
+  background: linear-gradient(to bottom, rgba(127,255,106,0.8), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* ── MARQUEE ── */
+.marquee-wrap {
+  position: relative; z-index: 1;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  padding: 1.25rem 0;
+  background: rgba(10,10,10,0.8);
+}
+.marquee-track {
+  display: flex; gap: 4rem;
+  animation: marquee 20s linear infinite;
+  width: max-content;
+}
+.marquee-item {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.75rem; font-weight: 300;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(240,240,240,0.2);
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 4rem;
+}
+.marquee-dot { color: var(--accent); font-size: 0.5rem; }
+
+/* ── SECTIONS ── */
+.section {
+  position: relative; z-index: 1;
+  padding: 10rem 3rem;
+  max-width: 1300px; margin: 0 auto;
+}
+
+/* ── WORK SECTION ── */
+.work-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 5rem;
+}
+.section-num {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.65rem; font-weight: 300;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1.5rem; display: block;
+}
+.section-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 700; line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+.section-title .dim { color: rgba(240,240,240,0.2); }
+
+.work-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.work-card {
+  position: relative; overflow: hidden;
+  height: 480px;
+  background: var(--mid);
+  cursor: none;
+}
+.work-card:nth-child(1) { grid-row: span 2; height: auto; min-height: 500px; }
+.work-card-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 3rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.work-card:hover .work-card-inner { transform: scale(1.02); }
+
+.work-card-bg {
+  position: absolute; inset: 0;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.work-card:hover .work-card-bg { transform: scale(1.05); }
+
+/* Animated gradient backgrounds for cards */
+.card-bg-1 {
+  background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0d1f35 100%);
+  animation: gradShift1 8s ease-in-out infinite;
+}
+.card-bg-2 {
+  background: linear-gradient(135deg, #1a0a28 0%, #2a1a4a 50%, #1a0d35 100%);
+  animation: gradShift2 10s ease-in-out infinite;
+}
+.card-bg-3 {
+  background: linear-gradient(135deg, #0a2818 0%, #1a4a2a 50%, #0d351a 100%);
+  animation: gradShift3 12s ease-in-out infinite;
+}
+.card-bg-4 {
+  background: linear-gradient(135deg, #281a0a 0%, #4a2a1a 50%, #351d0d 100%);
+  animation: gradShift4 9s ease-in-out infinite;
+}
+
+/* Floating shapes in cards */
+.card-shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  animation: float 6s ease-in-out infinite;
+}
+
+.work-tag {
+  font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent); font-weight: 300; margin-bottom: 0.75rem;
+}
+.work-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-weight: 700; line-height: 1.1; letter-spacing: -0.02em;
+}
+.work-arrow {
+  position: absolute; top: 2rem; right: 2rem;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+.work-card:hover .work-arrow {
+  background: var(--accent); border-color: var(--accent); color: var(--black);
+}
+
+/* ── PROCESS SECTION ── */
+.process-section {
+  position: relative; z-index: 1;
+  padding: 10rem 3rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.process-inner { max-width: 1300px; margin: 0 auto; }
+
+.process-steps {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  margin-top: 6rem;
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+.process-step {
+  padding: 3rem 2.5rem;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: relative; overflow: hidden;
+  transition: background 0.3s;
+}
+.process-step:hover { background: rgba(127,255,106,0.03); }
+.process-step::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.process-step:hover::before { transform: scaleX(1); }
+
+.step-num {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 4rem; font-weight: 900;
+  color: rgba(255,255,255,0.04);
+  line-height: 1; margin-bottom: 2rem;
+  transition: color 0.3s;
+}
+.process-step:hover .step-num { color: rgba(127,255,106,0.08); }
+.step-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.95rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+.step-body { font-size: 0.85rem; color: rgba(240,240,240,0.4); line-height: 1.75; font-weight: 300; }
+
+/* ── NUMBERS SECTION ── */
+.numbers-section {
+  position: relative; z-index: 1;
+  padding: 0 3rem 10rem;
+}
+.numbers-inner {
+  max-width: 1300px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.number-item {
+  padding: 4rem 3rem;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: relative; overflow: hidden;
+}
+.number-item:last-child { border-right: none; }
+.number-big {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(3rem, 6vw, 6rem);
+  font-weight: 900; line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.number-label {
+  font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(240,240,240,0.3); font-weight: 400;
+  margin-top: 1rem;
+}
+
+/* ── CTA SECTION ── */
+.cta-section {
+  position: relative; z-index: 1;
+  padding: 10rem 3rem;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.cta-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(3rem, 8vw, 9rem);
+  font-weight: 900; line-height: 0.9;
+  letter-spacing: -0.04em;
+  margin-bottom: 3rem;
+}
+.cta-title .green { color: var(--accent); }
+
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 1rem;
+  background: var(--accent); color: var(--black);
+  padding: 1.25rem 3rem;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none; border-radius: 50px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative; overflow: hidden;
+}
+.cta-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+}
+.cta-btn:hover::before { transform: translateX(0); }
+.cta-btn:hover { transform: translateY(-3px); box-shadow: 0 20px 60px rgba(127,255,106,0.3); }
+
+.cta-contact {
+  margin-top: 2.5rem;
+  font-size: 0.8rem; color: rgba(240,240,240,0.3);
+  letter-spacing: 0.1em;
+}
+.cta-contact a { color: var(--accent); text-decoration: none; }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 1;
+  padding: 3rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+}
+.footer-logo {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.8rem; font-weight: 700;
+  color: rgba(240,240,240,0.3); text-decoration: none;
+}
+.footer-copy { font-size: 0.65rem; color: rgba(240,240,240,0.15); letter-spacing: 0.1em; }
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50% { opacity: 0.3; transform: scaleY(0.7); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, -20px) scale(1.05); }
+  66% { transform: translate(-10px, 15px) scale(0.95); }
+}
+@keyframes gradShift1 {
+  0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(20deg) brightness(1.2); }
+}
+@keyframes gradShift2 {
+  0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(-20deg) brightness(1.15); }
+}
+@keyframes gradShift3 {
+  0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(30deg) brightness(1.1); }
+}
+@keyframes gradShift4 {
+  0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(-15deg) brightness(1.2); }
+}
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes counterRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* ── PARALLAX ELEMENTS ── */
+.parallax-el {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { padding: 1.25rem 1.5rem; }
+  .section { padding: 6rem 1.5rem; }
+  .work-grid { grid-template-columns: 1fr; }
+  .work-card:nth-child(1) { min-height: 400px; }
+  .process-steps { grid-template-columns: 1fr 1fr; }
+  .numbers-inner { grid-template-columns: 1fr; }
+  .number-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .process-section, .numbers-section, .cta-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+  footer { padding: 2rem 1.5rem; }
+  body { cursor: auto; }
+  .cursor, .cursor-ring { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- CANVAS BACKGROUND -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Isaiah Grafas</a>
+  <div class="nav-right">
+    <a href="#work" class="nav-link">Work</a>
+    <a href="#process" class="nav-link">Process</a>
+    <a href="#contact" class="nav-link">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">Web Design · Tauranga, New Zealand</div>
+    <h1 class="hero-title">
+      <span class="line">YOUR SITE</span>
+      <span class="line outline">IS YOUR</span>
+      <span class="line accent-word">SALES.</span>
+    </h1>
+    <p class="hero-sub">Websites that turn visitors into customers — built for Tauranga businesses.</p>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Web Design <span class="marquee-dot">◆</span> Tauranga <span class="marquee-dot">◆</span> Bay of Plenty <span class="marquee-dot">◆</span> $500 Websites <span class="marquee-dot">◆</span> Fast Turnaround <span class="marquee-dot">◆</span> Local Business <span class="marquee-dot">◆</span> Web Design <span class="marquee-dot">◆</span> Tauranga <span class="marquee-dot">◆</span> Bay of Plenty <span class="marquee-dot">◆</span> $500 Websites <span class="marquee-dot">◆</span> Fast Turnaround <span class="marquee-dot">◆</span> Local Business <span class="marquee-dot">◆</span> Web Design <span class="marquee-dot">◆</span> Tauranga <span class="marquee-dot">◆</span> Bay of Plenty <span class="marquee-dot">◆</span> $500 Websites <span class="marquee-dot">◆</span> Fast Turnaround <span class="marquee-dot">◆</span> Local Business</div>
+  </div>
+</div>
+
+<!-- WORK -->
+<div class="section" id="work">
+  <div class="work-header reveal">
+    <div>
+      <span class="section-num">01 — Work</span>
+      <h2 class="section-title">Recent<br><span class="dim">Builds.</span></h2>
+    </div>
+    <p style="max-width:300px; font-size:0.85rem; color:rgba(240,240,240,0.4); line-height:1.75; font-weight:300;">Every site built from scratch. No templates. No shortcuts. Just clean code and sharp design.</p>
+  </div>
+
+  <div class="work-grid">
+    <!-- Card 1 - large -->
+    <div class="work-card reveal">
+      <div class="work-card-bg card-bg-1">
+        <div class="card-shape" style="width:300px;height:300px;top:-50px;right:-50px;background:rgba(127,255,106,0.15);animation-delay:0s;"></div>
+        <div class="card-shape" style="width:200px;height:200px;bottom:100px;left:20px;background:rgba(106,240,255,0.1);animation-delay:2s;"></div>
+      </div>
+      <div class="work-arrow">↗</div>
+      <div class="work-card-inner">
+        <div class="work-tag">Roofing · Tauranga</div>
+        <div class="work-title">Mount Roof<br>Services</div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="work-card reveal reveal-delay-1">
+      <div class="work-card-bg card-bg-2">
+        <div class="card-shape" style="width:250px;height:250px;top:20px;left:-30px;background:rgba(255,106,159,0.15);animation-delay:1s;"></div>
+        <div class="card-shape" style="width:150px;height:150px;bottom:50px;right:50px;background:rgba(127,255,106,0.1);animation-delay:3s;"></div>
+      </div>
+      <div class="work-arrow">↗</div>
+      <div class="work-card-inner">
+        <div class="work-tag">Personal Training · Tauranga</div>
+        <div class="work-title">BOSSLADY</div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="work-card reveal reveal-delay-2">
+      <div class="work-card-bg card-bg-3">
+        <div class="card-shape" style="width:280px;height:280px;bottom:-80px;right:-40px;background:rgba(106,240,255,0.12);animation-delay:0.5s;"></div>
+        <div class="card-shape" style="width:120px;height:120px;top:40px;left:60px;background:rgba(255,106,159,0.08);animation-delay:2.5s;"></div>
+      </div>
+      <div class="work-arrow">↗</div>
+      <div class="work-card-inner">
+        <div class="work-tag">Hair Studio · Greerton</div>
+        <div class="work-title">Scarlet Hair<br>Studio</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="process-inner">
+    <div class="reveal">
+      <span class="section-num">02 — How It Works</span>
+      <h2 class="section-title">Simple<br><span class="dim">Process.</span></h2>
+    </div>
+
+    <div class="process-steps">
+      <div class="process-step reveal reveal-delay-1">
+        <div class="step-num">01</div>
+        <div class="step-title">I Find You</div>
+        <p class="step-body">I research local businesses with weak or missing websites and build a custom site before reaching out. You see the result before any conversation.</p>
+      </div>
+      <div class="process-step reveal reveal-delay-2">
+        <div class="step-num">02</div>
+        <div class="step-title">You View It</div>
+        <p class="step-body">A live link to your new site — free of charge, no strings attached. If you like what you see, we talk. If not, no problem.</p>
+      </div>
+      <div class="process-step reveal reveal-delay-3">
+        <div class="step-num">03</div>
+        <div class="step-title">One Payment</div>
+        <p class="step-body">$500 NZD one-time. That's it. The site is yours to keep. No monthly fees, no retainer, no ongoing costs from me.</p>
+      </div>
+      <div class="process-step reveal reveal-delay-4">
+        <div class="step-num">04</div>
+        <div class="step-title">You Go Live</div>
+        <p class="step-body">Host it on GitHub Pages for free. Buy a domain for ~$30/year. Your business is live, professional and findable online.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NUMBERS -->
+<div class="numbers-section">
+  <div class="numbers-inner">
+    <div class="number-item reveal">
+      <div class="number-big" data-count="15">0</div>
+      <div class="number-label">Sites Built This Week</div>
+    </div>
+    <div class="number-item reveal reveal-delay-1">
+      <div class="number-big">$500</div>
+      <div class="number-label">Flat Rate — No Surprises</div>
+    </div>
+    <div class="number-item reveal reveal-delay-2">
+      <div class="number-big">24h</div>
+      <div class="number-label">Average Build Time</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section" id="contact">
+  <h2 class="cta-title reveal">
+    Ready to<br>get <span class="green">online?</span>
+  </h2>
+  <a href="mailto:isaiahgrafas@gmail.com" class="cta-btn reveal">
+    Let's Talk →
+  </a>
+  <div class="cta-contact reveal">
+    Or call / text <a href="tel:+64">Isaiah</a> directly · Based in Tauranga, BOP
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">Isaiah Grafas · Web Design</a>
+  <div class="footer-copy">© 2025 · Tauranga, New Zealand</div>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .work-card, .process-step').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '20px';
+    cursor.style.height = '20px';
+    ring.style.width = '60px';
+    ring.style.height = '60px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '12px';
+    cursor.style.height = '12px';
+    ring.style.width = '40px';
+    ring.style.height = '40px';
+  });
+});
+
+// ── CANVAS PARTICLE FIELD ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const PARTICLE_COUNT = 120;
+const particles = [];
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 1.5 + 0.3;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.opacity = Math.random() * 0.4 + 0.05;
+    this.color = Math.random() > 0.7 ? '#7fff6a' : Math.random() > 0.5 ? '#6af0ff' : '#ffffff';
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.opacity;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+// Connection lines
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(127,255,106,${0.06 * (1 - dist / 120)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+// Mouse influence
+let mouseX = -1000, mouseY = -1000;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+function animateCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Mouse glow
+  const grad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 200);
+  grad.addColorStop(0, 'rgba(127,255,106,0.04)');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    // Mouse repulsion
+    const dx = p.x - mouseX;
+    const dy = p.y - mouseY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 100) {
+      p.x += (dx / dist) * 1.5;
+      p.y += (dy / dist) * 1.5;
+    }
+    p.update();
+    p.draw();
+  });
+
+  drawConnections();
+  requestAnimationFrame(animateCanvas);
+}
+animateCanvas();
+
+// ── SCROLL REVEAL ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// ── PARALLAX ──
+let scrollY = 0;
+window.addEventListener('scroll', () => {
+  scrollY = window.scrollY;
+
+  // Hero title parallax
+  const heroTitle = document.querySelector('.hero-title');
+  if (heroTitle) {
+    heroTitle.style.transform = `translateY(${scrollY * 0.3}px)`;
+    heroTitle.style.opacity = 1 - (scrollY / window.innerHeight) * 1.5;
+  }
+
+  // Marquee speed based on scroll
+  const track = document.querySelector('.marquee-track');
+  if (track) {
+    const speed = 20 - Math.min(scrollY / 100, 15);
+    track.style.animationDuration = speed + 's';
+  }
+});
+
+// ── COUNT UP ANIMATION ──
+const countEls = document.querySelectorAll('[data-count]');
+const countObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const target = parseInt(e.target.dataset.count);
+      let current = 0;
+      const step = target / 50;
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { current = target; clearInterval(timer); }
+        e.target.textContent = Math.floor(current) + '+';
+      }, 30);
+      countObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+countEls.forEach(el => countObserver.observe(el));
+
+// ── CARD TILT ──
+document.querySelectorAll('.work-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) scale(1.02)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ── SMOOTH SCROLL ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
+</body>
+</html>
